@@ -34,33 +34,48 @@ var putDataInDB = function(userID, data) {
 }
 
 exports.handler = function(event, context) {
-   
-   const app = Consumer.create({
-        queueUrl: QueueUrl,
-        handleMessage: (message, done) => {
-            var userData = JSON.parse(message.Body);
-            console.log(userData);
-            AMS.getAllData(userData.userID, userData.type, userData.username, userData.password).then(function(data){
-                putDataInDB(userData.userID, data).then(() => done());
-            }).catch(function(err){
-                console.log('Error in AMS - ' + err);
-                context.fail(err);
-            });
-        },
-        sqs : new AWS.SQS()
-    });
 
-    app.on('error', (err) => {
-        console.log("Eroor in queue - " + err.message);
-    });
+   if(event.userID && event.type && event.username && event.password) {
+       console.log("Inside the condition.");
+       console.log(event);
+       AMS.getAllData(event.userID, event.type, event.username, event.password).then(function(data){
+            putDataInDB(event.userID, data).then(() => {
+                context.succeed(data);
+                });
+        }).catch(function(err){
+            console.log('Error in AMS - ' + err);
+            context.fail(err);
+        });
+   } else {
+       const app = Consumer.create({
+            queueUrl: QueueUrl,
+            handleMessage: (message, done) => {
+                var userData = JSON.parse(message.Body);
+                console.log(userData);
+                AMS.getAllData(userData.userID, userData.type, userData.username, userData.password).then(function(data){
+                    putDataInDB(userData.userID, data).then(() => {
 
-    app.on('empty', () => {
-       context.succeed("The queue is empty. Quiting process");
-    });
+                        done()});
+                }).catch(function(err){
+                    console.log('Error in AMS - ' + err);
+                    context.fail(err);
+                });
+            },
+            sqs : new AWS.SQS()
+        });
 
-    app.start();
+        app.on('error', (err) => {
+            console.log("Eroor in queue - " + err.message);
+        });
+
+        app.on('empty', () => {
+        context.succeed("The queue is empty. Quiting process");
+        });
+
+        app.start();
+   }
     
 }
 
 //Uncomment below line for testing fast.
-require('make-runnable');
+//require('make-runnable');
