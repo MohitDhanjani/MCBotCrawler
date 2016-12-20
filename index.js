@@ -42,6 +42,9 @@ exports.handler = function(event, context) {
             console.log(userData);
             AMS.getAllData(userData.userID, userData.type, userData.username, userData.password).then(function(data){
                 putDataInDB(userData.userID, data).then(() => done());
+            }).catch(function(err){
+                console.log('Error in AMS - ' + err);
+                context.fail(err);
             });
         },
         sqs : new AWS.SQS()
@@ -60,4 +63,4 @@ exports.handler = function(event, context) {
 }
 
 //Uncomment below line for testing fast.
-//require('make-runnable');
+require('make-runnable');

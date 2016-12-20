@@ -127,7 +127,6 @@ module.exports.getAllData = function(userID, type, username, password){
                     
                         $ = cheerio.load(body);
 
-                        
                         $('table').each(function(i, ele){
                             if(ele.attribs.id === 'ListAttendanceSummary_table') {
                                 
@@ -155,12 +154,19 @@ module.exports.getAllData = function(userID, type, username, password){
                         return resolve(dataForDB);
                         
                         
-                        }
+                    }
+                    else {
+                        return reject('AMS returned ' + response.statusCode + ' status code. Possibly offline.');
+                    }
         }
 
         var takeAction = function(err, response, body){
             if(response.statusCode == 200) {
                 $ = cheerio.load(body);
+
+                if($('#loginbox').length >= 1) {
+                    return reject('Login unsuccessful');
+                }
                 
                 var link = $('a:contains("Academic Status")').attr('href');
                 
@@ -168,6 +174,9 @@ module.exports.getAllData = function(userID, type, username, password){
 
                 var options = {url:AMSDomain + link, headers: {'Cookie': cookie}};
                 request(options, takeSecondAction);
+            }
+            else {
+                return reject('AMS returned ' + response.statusCode + ' status code. Possibly offline.');
             }
         };
 
