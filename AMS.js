@@ -2,8 +2,6 @@ var cheerio = require('cheerio');
 var request = require('request');
 var Promise = require('bluebird');
 var S = require('string');
-//var fs = require('fs');
-var md5 = require('md5');
 
 require('dotenv').config();
 var AMSDomain = process.env.AMS_DOMAIN
