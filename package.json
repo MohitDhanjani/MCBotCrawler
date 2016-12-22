@@ -6,10 +6,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://mohitdhanjani@github.com/MohitDhanjani/MCBotCrawler.git"
-  },
   "author": "Mohit R. Dhanjani",
   "license": "ISC",
   "bugs": {
@@ -17,14 +13,11 @@
   },
   "homepage": "https://github.com/MohitDhanjani/MCBotCrawler#readme",
   "dependencies": {
-    "aws-sdk": "^2.7.15",
     "bluebird": "^3.4.6",
     "cheerio": "^0.22.0",
     "dotenv": "^2.0.0",
-    "dynamite": "^0.8.1",
     "md5": "^2.2.1",
     "request": "^2.79.0",
-    "sqs-consumer": "^3.4.0",
     "string": "^3.3.3"
   },
   "devDependencies": {

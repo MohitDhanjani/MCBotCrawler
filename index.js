@@ -1,81 +1,47 @@
 var request = require('request');
 var cheerio = require('cheerio');
-const Consumer = require('sqs-consumer'); 
 var Promise = require('bluebird');
-var AWS = require('aws-sdk');
 var AMS = require('./AMS');
-var Dynamite = require('dynamite');
+var fs = require('fs');
 
 require('dotenv').config();
 
-const DDBTable = process.env.DYNAMODB_TABLE;
-const DDBHashKey = process.env.DYNAMODB_HASH_KEY;
-const QueueUrl = process.env.SQS_QUEUE_URL;
+exports.handler = function() {
 
-var dbclient = new Dynamite.Client({region: process.env.AWS_REGION});
+   /*
+    You have two ways to login. One via the normal Username/Password method.
+    Other via the Registration ID and Birthdate method.
 
-var putDataInDB = function(userID, data) {
+   */
 
-    return new Promise(function(resolve, reject){
-        dbclient.newUpdateBuilder(DDBTable)
-        .setHashKey(DDBHashKey, userID)
-        .enableUpsert()
-        .putAttribute('latest_sem', JSON.stringify(data))
-        .putAttribute('gpa', JSON.stringify(data.gpa))
-        .putAttribute('md5_hash', data.md5value)
-        .execute().then(function(ds){
-            resolve(true);
-        }).fail(function(err){
-            console.log(err);
-        });
-    });
+   //This is for the normal username and password method. Modify details accordingly.
+   var loginDetails = {
+        "username" : "YourUsername", //Your AMS username. If not this, see the below alternate login.
+        "password" : "YourPassword", //Your AMS password.
+        "type" : "password" //DO NOT modify this.
+    }
 
-    
-}
+    //This is for registration ID and birthdate method. Modify details accordingly.
+    var loginDetailsAlternate = {
+        "username" : "123456789", //Your registration ID (9 digit).
+        "password" : "1993-12-30", //Your date of birth in YYYY-MM-DD format.
+        "type" : "regbirth" //DO NOT modify this.
+    }
 
-exports.handler = function(event, context) {
+   /*
+    Replace the loginDetailsAlternate variable either with loginDetails (if you are using Username method
+    or loginDetailsAlternate if you are using registration ID method.
+   */
+   var event = loginDetailsAlternate;
 
-   if(event.userID && event.type && event.username && event.password) {
-       console.log("Inside the condition.");
-       console.log(event);
-       AMS.getAllData(event.userID, event.type, event.username, event.password).then(function(data){
-            putDataInDB(event.userID, data).then(() => {
-                context.succeed(data);
-                });
+   if(event.type && event.username && event.password) {
+       AMS.getAllData(event.type, event.username, event.password).then(function(data){
+            console.log(JSON.stringify(data));
         }).catch(function(err){
             console.log('Error in AMS - ' + err);
-            context.fail(err);
         });
-   } else {
-       const app = Consumer.create({
-            queueUrl: QueueUrl,
-            handleMessage: (message, done) => {
-                var userData = JSON.parse(message.Body);
-                console.log(userData);
-                AMS.getAllData(userData.userID, userData.type, userData.username, userData.password).then(function(data){
-                    putDataInDB(userData.userID, data).then(() => {
-
-                        done()});
-                }).catch(function(err){
-                    console.log('Error in AMS - ' + err);
-                    context.fail(err);
-                });
-            },
-            sqs : new AWS.SQS()
-        });
-
-        app.on('error', (err) => {
-            console.log("Eroor in queue - " + err.message);
-        });
-
-        app.on('empty', () => {
-        context.succeed("The queue is empty. Quiting process");
-        });
-
-        app.start();
    }
     
 }
 
-//Uncomment below line for testing fast.
-//require('make-runnable');
+require('make-runnable');

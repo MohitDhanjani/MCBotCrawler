@@ -2,7 +2,7 @@ var cheerio = require('cheerio');
 var request = require('request');
 var Promise = require('bluebird');
 var S = require('string');
-var fs = require('fs');
+//var fs = require('fs');
 var md5 = require('md5');
 
 require('dotenv').config();
@@ -101,7 +101,7 @@ var parseGPA = function(data) {
 	});
 }
 
-module.exports.getAllData = function(userID, type, username, password){
+module.exports.getAllData = function(type, username, password){
 
     var form = {USERNAME:username, PASSWORD:password};
 
