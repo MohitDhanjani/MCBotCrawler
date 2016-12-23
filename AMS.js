@@ -165,7 +165,7 @@ module.exports.getAllData = function(userID, type, username, password){
                 $ = cheerio.load(body);
 
                 if($('#loginbox').length >= 1) {
-                    return reject('Login unsuccessful');
+                    return reject('LoginUnsuccessful');
                 }
                 
                 var link = $('a:contains("Academic Status")').attr('href');
