@@ -156,6 +156,27 @@ var parseCourseGrades = function(data) {
     });
 }
 
+var extractPrevSemLinks = function(data) {
+    return new Promise(function(resolve, reject){
+        var sem = {};
+        $ = cheerio.load(data);
+
+            $('tr').each(function(a, ele){
+                var link = {};
+                var semno;
+                $(this).children().each(function(n, element){
+                    if(n === 0){
+                        semno = $(this).find('span').text();
+                        semno = parseInt(semno.charAt(semno.length-1));
+                        sem[semno]  = AMSDomain + $(this).find('a').attr('href');
+                    }
+                });
+            });
+            delete sem[Object.keys(sem).length]; //length equals the parseInt('your_current_semester') which has already been processed in AMS.js. Hence not required.
+        resolve(sem);
+    });
+}
+
 module.exports.getAllData = function(userID, type, username, password){
 
     var form = {USERNAME:username, PASSWORD:password};
@@ -207,8 +228,6 @@ module.exports.getAllData = function(userID, type, username, password){
                         });
 
                         return resolve(dataForDB);
-                        
-                        
                     }
                     else {
                         return reject('AMS returned ' + response.statusCode + ' status code. Possibly offline.');
