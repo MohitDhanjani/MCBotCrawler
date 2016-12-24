@@ -156,7 +156,7 @@ var parseCourseGrades = function(data) {
     });
 }
 
-var extractPrevSemLinks = function(data) {
+var extractPrevTermLinks = function(data) {
     return new Promise(function(resolve, reject){
         var sem = {};
         $ = cheerio.load(data);
