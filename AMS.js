@@ -146,7 +146,7 @@ var parseCourseGrades = function(data) {
                         subject.credits = parseInt($(this).find('span').text().replace('\n', ''));
                     }
                     if(n === 3){
-                        subject.grades = $(this).find('span').text().replace('\n', '');
+                        subject.grade = $(this).find('span').text().replace('\n', '');
                         grades[a] = subject;
                         subject = null;
                     }
