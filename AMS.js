@@ -101,6 +101,61 @@ var parseGPA = function(data) {
 	});
 }
 
+var parseIncompleteCourses = function(data){
+    return new Promise(function(resolve, reject){
+        var courses = [];
+        $ = cheerio.load(data);
+
+            $('tr').each(function(a, ele){
+                var subject = {};
+                $(this).children().each(function(n, element){
+                    if(n === 0) {
+                        subject.code = $(this).find('span').text().replace('\n', '');
+                    }
+                    if(n === 1){
+                        subject.name = $(this).find('span').text().replace('\n', '');
+                    }
+                    if(n === 3){
+                        subject.marks = $(this).find('span').text().replace('\n', '');
+                        courses[a] = subject;
+                        subject = null;
+                    }
+                });
+            });
+        resolve(courses);
+    });
+
+}
+
+var parseCourseGrades = function(data) {
+
+    return new Promise(function(resolve, reject){
+        var grades = [];
+        $ = cheerio.load(data);
+
+            $('tr').each(function(a, ele){
+                var subject = {};
+                $(this).children().each(function(n, element){
+                    if(n === 0) {
+                        subject.code = $(this).find('span').text().replace('\n', '');
+                    }
+                    if(n === 1){
+                        subject.name = $(this).find('span').text().replace('\n', '');
+                    }
+                    if(n === 2){
+                        subject.credits = parseInt($(this).find('span').text().replace('\n', ''));
+                    }
+                    if(n === 3){
+                        subject.grades = $(this).find('span').text().replace('\n', '');
+                        grades[a] = subject;
+                        subject = null;
+                    }
+                });
+            });
+        resolve(grades);
+    });
+}
+
 module.exports.getAllData = function(userID, type, username, password){
 
     var form = {USERNAME:username, PASSWORD:password};
