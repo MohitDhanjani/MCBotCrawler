@@ -117,7 +117,7 @@ var parseIncompleteCourses = function(data){
                     }
                     if(n === 3){
                         subject.marks = $(this).find('span').text().replace('\n', '');
-                        courses[a] = subject;
+                        courses.push(subject);
                         subject = null;
                     }
                 });
@@ -147,7 +147,7 @@ var parseCourseGrades = function(data) {
                     }
                     if(n === 3){
                         subject.grade = $(this).find('span').text().replace('\n', '');
-                        grades[a] = subject;
+                        grades.push(subject);
                         subject = null;
                     }
                 });
